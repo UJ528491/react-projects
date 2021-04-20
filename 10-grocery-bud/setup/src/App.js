@@ -2,18 +2,28 @@ import React, { useState, useEffect } from "react";
 import List from "./List";
 import Alert from "./Alert";
 
+const getLocalStorage = () => {
+  let oldList = localStorage.getItem("list");
+  if (oldList) {
+    return JSON.parse(oldList);
+  } else {
+    return [];
+  }
+};
 function App() {
-  const [list, setList] = useState([]);
+  const [list, setList] = useState(getLocalStorage());
   const [value, setValue] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editID, setEditID] = useState(null);
   const [alert, setAlert] = useState({ show: false, msg: "", type: "" });
   useEffect(() => {
-    console.log(list);
     const closeAlert = setTimeout(() => {
       showAlert();
     }, 3000);
     return () => clearTimeout(closeAlert);
+  }, [list]);
+  useEffect(() => {
+    localStorage.setItem("list", JSON.stringify(list));
   }, [list]);
   const handleSubmit = e => {
     e.preventDefault();
@@ -47,6 +57,7 @@ function App() {
     showAlert(true, "value removed", "alert alert-danger");
   };
   const editItem = (oldValue, oldID) => {
+    document.querySelector(".grocery").focus();
     setIsEditing(true);
     setValue(oldValue);
     setEditID(oldID);

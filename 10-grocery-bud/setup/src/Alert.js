@@ -1,12 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 
-const Alert = ({ msg, type, list, showAlert }) => {
-  useEffect(() => {
-    const closeAlert = setTimeout(() => {
-      showAlert();
-    }, 3000);
-    return clearTimeout(closeAlert);
-  }, [list]);
+const Alert = ({ msg, type }) => {
   return <p className={type}>{msg}</p>;
 };
 
