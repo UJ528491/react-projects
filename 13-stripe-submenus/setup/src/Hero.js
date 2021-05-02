@@ -1,9 +1,11 @@
 import React from "react";
 import phoneImg from "./images/phone.svg";
+import { useGlobalContext } from "./context";
 
 const Hero = () => {
+  const { closeSubmenu } = useGlobalContext();
   return (
-    <section className="hero">
+    <section className="hero" onMouseMove={closeSubmenu}>
       <div className="hero-center">
         <article className="hero-info">
           <h1>
@@ -17,7 +19,7 @@ const Hero = () => {
           </p>
           <button className="btn">start now</button>
         </article>
-        <article className="hero-img">
+        <article className="hero-images">
           <img src={phoneImg} alt="phone" className="phone-img" />
         </article>
       </div>
