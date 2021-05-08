@@ -10,7 +10,7 @@ const initialState = {
   loading: false,
   cart: cartItems,
   total: 0,
-  amount: 0,
+  allAmount: 0,
 };
 
 const AppProvider = ({ children }) => {
@@ -21,12 +21,24 @@ const AppProvider = ({ children }) => {
   const remove = id => {
     dispatch({ type: "REMOVE", payload: id });
   };
+  const increase = id => {
+    dispatch({ type: "INCREASE", payload: id });
+  };
+  const decrease = id => {
+    dispatch({ type: "DECREASE", payload: id });
+  };
+  useEffect(() => {
+    dispatch({ type: "GET_TOTALS" });
+    console.log(state);
+  }, [state.cart]);
   return (
     <AppContext.Provider
       value={{
         ...state,
         clearCart,
         remove,
+        increase,
+        decrease,
       }}
     >
       {children}
