@@ -1,14 +1,117 @@
-import React from 'react'
-import Loading from '../components/Loading'
-import { useParams, Link } from 'react-router-dom'
-const url = 'https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i='
+import React, { useEffect, useState, useCallback } from "react";
+import Loading from "../components/Loading";
+import { useParams, Link } from "react-router-dom";
+const url = "https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=";
 
 const SingleCocktail = () => {
+  const { id } = useParams();
+  const [loading, setLoading] = useState(false);
+  const [cocktail, setCocktail] = useState(null);
+  const cocktailDetail = useCallback(async () => {
+    try {
+      const response = await fetch(`${url}${id}`);
+      const data = await response.json();
+      if (data) {
+        const {
+          strDrink: name,
+          strCategory: category,
+          strAlcoholic: info,
+          strGlass: glass,
+          strInstructions: instructions,
+          strDrinkThumb: image,
+          strIngredient1,
+          strIngredient2,
+          strIngredient3,
+          strIngredient4,
+        } = data.drinks[0];
+        const newCocktail = {
+          name,
+          category,
+          info,
+          glass,
+          instructions,
+          image,
+          ingredients: [
+            strIngredient1,
+            strIngredient2,
+            strIngredient3,
+            strIngredient4,
+          ],
+        };
+        setCocktail(newCocktail);
+        setLoading(false);
+      } else {
+        setCocktail(null);
+        setLoading(false);
+      }
+    } catch (e) {
+      console.log(e);
+      setLoading(false);
+    }
+  }, [id]);
+  useEffect(() => {
+    setLoading(true);
+    cocktailDetail();
+  }, [id, cocktailDetail]);
+  if (loading) {
+    return <Loading />;
+  }
+  if (!cocktail) {
+    return <h2 className="section-title">no cocktail to display</h2>;
+  }
+  const { name, category, info, glass, instructions, image, ingredients } =
+    cocktail;
   return (
-    <div>
-      <h2>single cocktail page </h2>
-    </div>
-  )
-}
+    <>
+      {loading ? (
+        <Loading />
+      ) : (
+        <section className="section cocktail-section">
+          <Link to="/" className="btn btn-primary">
+            back home
+          </Link>
+          <h2 className="section-title">{name}</h2>
+          <div className="drink">
+            <img src={image} alt={name} />
+            <div className="drink-info">
+              <p>
+                <span className="drink-data">name :</span>
+                {` ${name}`}
+              </p>
+              <p>
+                <span className="drink-data">category :</span>
+                {` ${category}`}
+              </p>
+              <p>
+                <span className="drink-data">info :</span>
+                {` ${info}`}
+              </p>
+              <p>
+                <span className="drink-data">glass :</span>
+                {` ${glass}`}
+              </p>
+              <p>
+                <span className="drink-data">instructions :</span>
+                {` ${instructions}`}
+              </p>
+              <p>
+                <span className="drink-data">ingredients :</span>
+                {/* {ingredients.map((item, index) => {
+                  if (item) {
+                    return ` ${item}`;
+                  }
+                  return "";
+                })} */}
+                {ingredients.map((item, index) =>
+                  item ? <span key={index}> {item}</span> : null
+                )}
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+    </>
+  );
+};
 
-export default SingleCocktail
+export default SingleCocktail;
