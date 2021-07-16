@@ -164,6 +164,9 @@ Stock Photos
 .form-input {
   color: var(--clr-grey-3);
 }
+.form-input:focus{
+  outline:none;
+}
 .form-input::placeholder {
   color: var(--clr-grey-5);
 }
