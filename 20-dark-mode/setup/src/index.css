@@ -4,11 +4,22 @@ Global Styles
 ===============
 */
 
-:root {
+/* :root {
+  --clr-bcg: #fff;
+  --clr-font: #282c35;
+  --clr-primary: #d23669;
+} */
+.dark-theme{
+    --clr-bcg: #282c35;
+    --clr-font: #fff;
+    --clr-primary: #ff91b6;
+}
+.light-theme{
   --clr-bcg: #fff;
   --clr-font: #282c35;
   --clr-primary: #d23669;
 }
+
 
 *,
 ::after,
@@ -16,7 +27,7 @@ Global Styles
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
+} 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
