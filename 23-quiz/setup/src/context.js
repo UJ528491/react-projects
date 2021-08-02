@@ -24,15 +24,19 @@ const AppProvider = ({ children }) => {
     category: null,
     difficulty: null,
   });
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [correctAnswers, seCorrectAnswers] = useState(0);
+  const [reFetch, setReFetch] = useState(false);
   const quizUrl = `${API_ENDPOINT}amount=${setup.amount}&category=${setup.category}&difficulty=${setup.difficulty}&type=multiple`;
   const questionCountUrl = `${API_Question_Count}${setup.category}`;
 
   const fetchCategories = async () => {
+    console.log("fetch category");
+    setIsLoading(true);
     try {
       const response = await axios(API_Categories);
       if (response) {
         const data = await response.data.trivia_categories;
-        console.log(data);
         setCategories(data);
         /* initial set */
         setSetup({ ...setup, category: data[0].id, difficulty: "easy" });
@@ -43,6 +47,7 @@ const AppProvider = ({ children }) => {
   };
 
   const fetchQuestionCount = async () => {
+    console.log("fetch questioncount");
     if (setup.category && setup.difficulty) {
       try {
         const response = await axios(questionCountUrl);
@@ -63,13 +68,20 @@ const AppProvider = ({ children }) => {
   };
 
   const fetchQuizAPI = async () => {
+    console.log("fetch quiz api", setup.amount);
     setWaiting(false);
     try {
       const response = await fetch(quizUrl);
       const data = await response.json();
-      console.log(data.results);
-      setQuiz(data.results);
-      setIsLoading(false);
+      if (data.results.length === 0) {
+        setReFetch(true);
+        setSetup({ ...setup, amount: setNumberOfQuestions() });
+        setWaiting(true);
+      } else {
+        setReFetch(false);
+        setQuiz(data.results);
+        setIsLoading(false);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -78,13 +90,17 @@ const AppProvider = ({ children }) => {
     const name = e.target.name;
     const value = e.target.value;
     setSetup({ ...setup, [name]: value });
-    console.log(e.target);
   };
   const handleSubmit = e => {
     e.preventDefault();
+    console.log(quiz);
     fetchQuizAPI();
   };
   const setNumberOfQuestions = () => {
+    console.log(setup.amount, questionCount);
+    if (reFetch) {
+      return setup.amount - 1;
+    }
     if (setup.amount > questionCount) {
       setSetup({ ...setup, amount: questionCount });
       return questionCount;
@@ -92,13 +108,26 @@ const AppProvider = ({ children }) => {
       return setup.amount;
     }
   };
+  const modalOpen = () => {
+    setModalIsOpen(true);
+  };
+  const modalClose = () => {
+    setWaiting(true);
+    setModalIsOpen(false);
+    seCorrectAnswers(0);
+    setIndex(0);
+  };
+  const correctPercent = () => {
+    return ((correctAnswers / setup.amount) * 100).toFixed(0);
+  };
+
   useEffect(() => {
     fetchCategories();
-    // fetchQuizAPI();
-  }, []);
+  }, [waiting]);
   useEffect(() => {
-    fetchQuestionCount();
-    console.log(setup);
+    if (!reFetch) {
+      fetchQuestionCount();
+    }
   }, [setup]);
 
   return (
@@ -111,10 +140,20 @@ const AppProvider = ({ children }) => {
         setup,
         questionCount,
         index,
+        modalIsOpen,
+        correctAnswers,
         setSetup,
         handleChange,
         handleSubmit,
         setNumberOfQuestions,
+        setIndex,
+        setModalIsOpen,
+        setWaiting,
+        modalOpen,
+        modalClose,
+        seCorrectAnswers,
+        correctPercent,
+        fetchQuizAPI,
       }}
     >
       {children}
